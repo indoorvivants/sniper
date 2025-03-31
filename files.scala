@@ -18,7 +18,7 @@ class Files(config: Config):
 
   def render(
       template: Template,
-      tempDir: os.Path,
+      dir: os.Path,
       globalFiles: List[GlobalFile]
   ) =
     val files = globalFiles
@@ -27,10 +27,17 @@ class Files(config: Config):
       template.files.map(f => (path = f.name, content = f.content))
 
     files.foreach { case (path, content) =>
-      scribe.info(s"Writing $path under $tempDir")
-      os.write(tempDir / path, content)
+      scribe.info(s"Writing $path under $dir")
+      os.write(dir / path, content)
     }
   end render
+
+  def prepare(snippetId: Long): os.Path =
+    val base = snippetFolder(snippetId)
+    if os.exists(base) then sys.error(s"$base already exists!")
+    os.makeDir.all(base)
+    base
+  end prepare
 
   def resolve(snippetId: Long) =
     if os.exists(snippetFolder(snippetId)) then snippetFolder(snippetId)

@@ -22,3 +22,17 @@ def promptDescription(prompts: SyncPrompts): String =
 
   prompts.run(prompt).getOrThrow
 end promptDescription
+
+def promptTemplate(
+    prompts: SyncPrompts,
+    templates: List[Template]
+): Option[Template] =
+  val prompt = prompts
+    .singleChoice(
+      "Select template to use",
+      "No template" :: templates.map(_.name)
+    )
+    .getOrThrow
+
+  templates.find(_.name == prompt)
+end promptTemplate
