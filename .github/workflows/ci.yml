@@ -81,7 +81,7 @@ jobs:
     runs-on: windows-2019
     env:
       LLVM_BIN: 'C:\Program Files\LLVM\bin'
-      LLVM_VERSION: "17.0.6"
+      LLVM_VERSION: "20.1.0"
     steps:
       # This step is important to make sure scalafmt
       # checks don't fail
@@ -124,7 +124,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: out/release/*
-          name: ${{ matrix.os }}-binaries
+          name: windows-binaries
           if-no-files-found: error
 
   release:

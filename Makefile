@@ -14,8 +14,8 @@ clean:
 	rm -rf out
 	scala-cli clean .
 
-SUFFIX = $(shell bash -c "cat .build.scala | scala-cli run _ -M coursierName")
-LTO_TYPE = $(shell bash -c "cat .build.scala | scala-cli run _ -M ltoFlag")
+SUFFIX = $(shell echo `cat .build.scala | scala-cli run _ -M coursierName`)
+LTO_TYPE = $(shell echo `cat .build.scala | scala-cli run _ -M ltoFlag`)
 
 bin: out/release
 	scala-cli package . -f -o out/release/sniper --native-mode release-fast $(LTO_TYPE)
