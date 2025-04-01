@@ -57,7 +57,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "21"
-          cache: "sbt"
 
       - uses: coursier/cache-action@v6
 
@@ -104,7 +103,13 @@ jobs:
           minimum-size: 4GB
           maximum-size: 16GB
 
-      - name: Install clang and SBT
+      - uses: coursier/cache-action@v6
+
+      - uses: VirtusLab/scala-cli-setup@main
+        with:
+          power: true
+
+      - name: Install clang and make
         shell: pwsh
         run: |
           choco install llvm --version="$Env:LLVM_VERSION" --allow-downgrade

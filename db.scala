@@ -71,9 +71,7 @@ class SnippetsDB private (using DbCon):
     sorted.map { case (filename, code) =>
       val attrs = SnippetFileAttributes(snippetId, filename, code)
       val uid = randomString()
-
       uids += uid
-
       snippetFilesRepo.insert(attrs.copy(uid = Some(uid)))
     }
 
