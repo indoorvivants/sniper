@@ -17,8 +17,16 @@ clean:
 SUFFIX = $(shell echo `cat .build.scala | scala-cli run _ -M coursierName`)
 LTO_TYPE = $(shell echo `cat .build.scala | scala-cli run _ -M ltoFlag`)
 
-bin: out/release
+out/flags/lto:
+	mkdir -p out/flags
+	cat .build.scala | scala-cli run _ -M ltoFlag > out/flags/lto
+
+out/flags/platform:
+	mkdir -p out/flags
+	cat .build.scala | scala-cli run _ -M coursierName > out/flags/platform
+
+bin: out/release out/flags/lto
 	scala-cli package . -f -o out/release/sniper --native-mode release-fast $(LTO_TYPE)
 
-platform-bin: out/release
-	scala-cli package . -f -o out/release/sniper-$(SUFFIX) --native-mode release-fast $(LTO_TYPE)
+platform-bin: out/release out/flags/platform out/flags/lto
+	scala-cli package . -f -o out/release/sniper-$$(cat out/flags/platform) --native-mode release-fast $$(cat out/flags/lto)
