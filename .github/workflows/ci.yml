@@ -118,7 +118,7 @@ jobs:
 
       - name: Build binary (windows)
         run: make platform-bin
-        shell: cmd
+        shell: bash
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
