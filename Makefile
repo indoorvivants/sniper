@@ -14,8 +14,8 @@ clean:
 	rm -rf out
 	scala-cli clean .
 
-SUFFIX = $(shell echo `cat .build.scala | scala-cli run _ -M coursierName`)
-LTO_TYPE = $(shell echo `cat .build.scala | scala-cli run _ -M ltoFlag`)
+SUFFIX = $(shell bash -c "cat .build.scala | scala-cli run _ -M coursierName")
+LTO_TYPE = $(shell bash -c "cat .build.scala | scala-cli run _ -M ltoFlag")
 
 out/flags/lto:
 	mkdir -p out/flags
