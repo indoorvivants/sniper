@@ -1,4 +1,4 @@
-package snippets
+package sniper
 
 import cue4s.*
 
@@ -13,11 +13,19 @@ def promptDescription(prompts: SyncPrompts): String =
   val prompt = Prompt
     .Input("Snippet description (max 240 characters)")
     .validate(s =>
-      Option.when(s.length > 240)(
-        PromptError(
-          s"Description is ${s.length} characters long (max: 240)"
+      Option
+        .when(s.length > 240)(
+          PromptError(
+            s"Description is too long (${s.length} characters, max: 240)"
+          )
         )
-      )
+        .orElse(
+          Option.when(s.length < 10)(
+            PromptError(
+              s"Description is too short (${s.length} characters, min: 10)"
+            )
+          )
+        )
     )
 
   prompts.run(prompt).getOrThrow

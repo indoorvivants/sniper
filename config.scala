@@ -1,4 +1,4 @@
-package snippets
+package sniper
 
 import toml.*
 
@@ -47,15 +47,15 @@ case class Config(
 end Config
 
 object Config:
-  def load(home: os.Path) =
-    val configFile = home / ".config" / "scala-snippets" / "config.toml"
+  def load(defaultDirs: DefaultLocations) =
+    val configFile = defaultDirs.configFile
     if !os.exists(configFile) then
       scribe.warn(
         "Config file not found, creating one with defaults",
         configFile.toString
       )
-      val dataDir = home / ".local" / "share" / "scala-snippets" / "data"
-      val dbFile = home / ".local" / "state" / "scala-snippets" / "snippets.db"
+      val dataDir = defaultDirs.share / "data"
+      val dbFile = defaultDirs.state / "snippets.db"
       os.makeDir.all(dataDir)
       os.makeDir.all(configFile / os.up)
       os.makeDir.all(dbFile / os.up)

@@ -1,7 +1,6 @@
-package snippets
+package sniper
 
 import com.augustnagro.magnum.*
-import java.nio.file.Path
 
 case class SnippetAttributes(
     description: String,

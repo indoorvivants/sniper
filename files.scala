@@ -1,4 +1,4 @@
-package snippets
+package sniper
 
 class Files(config: Config):
   private val folder = config.data
