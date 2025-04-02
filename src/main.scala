@@ -6,7 +6,7 @@ import cue4s.*
 @Help("Sniper is a command-line tool for managing code snippets.")
 @Name("sniper")
 enum CLI derives CommandApplication:
-  @Name("new") @Help("Create a new snippet") case New(
+  @Help("Create a new snippet") case New(
       @Short("d")
       @Help("Description of the snippet, between 10 and 240 characters long")
       description: Option[String],
@@ -16,13 +16,13 @@ enum CLI derives CommandApplication:
       )
       template: Option[String]
   )
-  @Name("open") @Help("Open a picker for existing snippets") case Open()
+  @Help("Open a picker for existing snippets") case Open
 
-  @Name("delete") @Help("Delete selected snippets") case Delete()
+  @Help("Delete selected snippets") case Delete
 
   @Name("print-config") @Help(
     "(for debugging) pretty print the configuration"
-  ) case PrintConfig()
+  ) case PrintConfig
 
   @Name("test-template") @Help(
     "(for debugging) test templates specified in configuration"
@@ -44,10 +44,10 @@ end CLI
       .use: prompts =>
         val context = Context(config, files, db, prompts)
         CommandApplication.parseOrExit[CLI](args) match
-          case cli: CLI.New          => commandNew(context, cli)
-          case CLI.Open()            => commandOpen(context)
-          case CLI.Delete()          => commandDelete(context)
-          case CLI.PrintConfig()     =>
+          case cli: CLI.New        => commandNew(context, cli)
+          case CLI.Open            => commandOpen(context)
+          case CLI.Delete          => commandDelete(context)
+          case CLI.PrintConfig     =>
             scribe.info(s"Config from [${defaultLocations.configFile}]")
             pprint.pprintln(config)
           case cli: CLI.TestTemplate => commandTestTemplate(context, cli)

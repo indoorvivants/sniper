@@ -4,7 +4,7 @@
 
 //> using dep com.github.lolgab::magnum::1.3.1
 //> using dep com.github.lolgab::scala-native-jdbc-sqlite::0.0.3
-//> using dep com.indoorvivants::decline-derive::0.3.0
+//> using dep com.indoorvivants::decline-derive::0.3.1
 //> using dep tech.neander::cue4s::0.0.7
 //> using dep com.indoorvivants::toml::0.3.0
 //> using dep com.outr::scribe::3.16.0
