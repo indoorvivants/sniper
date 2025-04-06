@@ -39,6 +39,9 @@ class SnippetsDB private (using DbCon):
   def getAll(): Vector[Snippet] =
     snippetsRepo.findAll
 
+  def get(id: Long): Option[Snippet] =
+    snippetsRepo.findById(id)
+
   private def randomString() =
     sql"select random()".query[Int].run().head.toString
 
