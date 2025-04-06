@@ -28,7 +28,9 @@ class Files(config: Config):
 
     files.foreach { case (path, content) =>
       scribe.info(s"Writing $path under $dir")
-      os.write(dir / path, content)
+      val relPath = dir / os.RelPath(path)
+      os.makeDir.all(relPath / os.up)
+      os.write(relPath, content)
     }
   end render
 

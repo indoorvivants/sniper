@@ -22,13 +22,22 @@ def commandNew(context: Context, cli: CLI.New) =
           .getOrElse(sys.error(s"Template '$value' not found"))
       )
 
+  val snippetBase = files.prepare(snippet.id)
+
   template.foreach: tpl =>
     val snippetFiles = tpl.files.map(f => f.name -> f.content).toMap
-    files.render(tpl, files.prepare(snippet.id), config.globalFiles)
+    files.render(tpl, snippetBase, config.globalFiles)
     db.addFilesToSnippet(
       snippet.id,
       snippetFiles
     )
+
+  import trigs.Progress
+  given Progress = Progress.Quiet
+
+  codesearch.withUpdater: updater =>
+    template.foreach: tpl =>
+      updater(tpl.files.map(_.name).map(p => snippetBase / os.RelPath(p)))
 
   println(files.resolve(snippet.id))
 end commandNew

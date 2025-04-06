@@ -61,6 +61,11 @@ class SnippetsDB private (using DbCon):
   def delete(id: Long) =
     snippetsRepo.deleteById(id)
 
+  def getFiles(snippetId: Long): Vector[SnippetFile] =
+    sql"select ${SnippetFile.Table.all} from ${SnippetFile.Table} where snippet_id = $snippetId"
+      .query[SnippetFile]
+      .run()
+
   def addFilesToSnippet(
       snippetId: Long,
       files: Map[String, String]

@@ -20,6 +20,15 @@ enum CLI derives CommandApplication:
 
   @Help("Delete selected snippets") case Delete
 
+  @Name("search-code") @Help(
+    "search code "
+  ) case SearchCode(
+      @Short("q") query: Option[String],
+      @Short("l") limit: Option[Int]
+  )
+
+  case Sync
+
   @Name("print-config") @Help(
     "(for debugging) pretty print the configuration"
   ) case PrintConfig
@@ -38,16 +47,20 @@ end CLI
   val config = Config.load(defaultLocations)
   val files = Files(config)
   val dbConfig = SnippetsDB.Config(config.db)
+  val codesearchConfig = CodeSearch.Config(defaultLocations.codesearchIndex, config.data)
+  val codesearch = CodeSearch(codesearchConfig)
   SnippetsDB.use(dbConfig): db =>
     Prompts.sync
       .withOutput(StderrOutput)
       .use: prompts =>
-        val context = Context(config, files, db, prompts)
+        val context = Context(config, files, db, prompts, codesearch)
         CommandApplication.parseOrExit[CLI](args) match
-          case cli: CLI.New        => commandNew(context, cli)
-          case CLI.Open            => commandOpen(context)
-          case CLI.Delete          => commandDelete(context)
-          case CLI.PrintConfig     =>
+          case cli: CLI.New             => commandNew(context, cli)
+          case CLI.Open                 => commandOpen(context)
+          case CLI.Delete               => commandDelete(context)
+          case CLI.Sync               => commandSync(context)
+          case cli: CLI.SearchCode      => commandSearchCode(context, cli)
+          case CLI.PrintConfig          =>
             scribe.info(s"Config from [${defaultLocations.configFile}]")
             pprint.pprintln(config)
           case cli: CLI.TestTemplate => commandTestTemplate(context, cli)
@@ -66,5 +79,6 @@ case class Context(
     config: Config,
     files: Files,
     db: SnippetsDB,
-    prompts: SyncPrompts
+    prompts: SyncPrompts,
+    codesearch: CodeSearch
 )

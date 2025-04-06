@@ -6,4 +6,5 @@ class DefaultLocations(home: os.Path):
   lazy val configFile = configDir / "config.toml"
   lazy val share = home / ".local" / "share" / NAME
   lazy val state = home / ".local" / "state" / NAME
+  lazy val codesearchIndex = state / "codesearch.trig"
 end DefaultLocations
