@@ -49,16 +49,17 @@ end CLI
   val dbConfig = SnippetsDB.Config(config.db)
   val codesearchConfig = CodeSearch.Config(defaultLocations.codesearchIndex, config.data)
   val codesearch = CodeSearch(codesearchConfig)
+  val terminal = AnsiTerminal(StderrOutput)
   SnippetsDB.use(dbConfig): db =>
     Prompts.sync
       .withOutput(StderrOutput)
       .use: prompts =>
-        val context = Context(config, files, db, prompts, codesearch)
+        val context = Context(config, files, db, prompts, codesearch, () => terminal.screenClear())
         CommandApplication.parseOrExit[CLI](args) match
           case cli: CLI.New             => commandNew(context, cli)
           case CLI.Open                 => commandOpen(context)
           case CLI.Delete               => commandDelete(context)
-          case CLI.Sync               => commandSync(context)
+          case CLI.Sync                 => commandSync(context)
           case cli: CLI.SearchCode      => commandSearchCode(context, cli)
           case CLI.PrintConfig          =>
             scribe.info(s"Config from [${defaultLocations.configFile}]")
@@ -80,5 +81,6 @@ case class Context(
     files: Files,
     db: SnippetsDB,
     prompts: SyncPrompts,
-    codesearch: CodeSearch
+    codesearch: CodeSearch,
+    clearTerminal: () => Unit
 )
