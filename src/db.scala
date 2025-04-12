@@ -62,6 +62,8 @@ class SnippetsDB private (using DbCon):
   end add
 
   def delete(id: Long) =
+    val files = getFiles(id)
+    files.foreach(f => snippetFilesRepo.deleteById(f.id))
     snippetsRepo.deleteById(id)
 
   def getFiles(snippetId: Long): Vector[SnippetFile] =

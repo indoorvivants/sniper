@@ -41,11 +41,6 @@ class Files(config: Config):
     base
   end prepare
 
-  def resolve(snippetId: Long) =
-    if os.exists(snippetFolder(snippetId)) then snippetFolder(snippetId)
-    else
-      sys.error(
-        s"Snippet folder ${{ snippetFolder(snippetId) }} does not exist!"
-      )
+  def resolve(snippetId: Long) = snippetFolder(snippetId)
 
 end Files

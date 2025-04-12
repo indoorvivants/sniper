@@ -3,6 +3,9 @@ package sniper
 import trigs.*
 import os.Path
 
+enum UpdateAction:
+  case Delete, Reindex
+
 class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
   def pathResolver(path: os.Path): (os.RelPath, Int) =
     val rel = path.relativeTo(config.codeDir)
@@ -16,16 +19,26 @@ class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
         pathResolver(loc.file) :* loc.line
   end search
 
-  def withUpdater(f: (Seq[os.Path] => Unit) => Unit)(using
+  def withUpdater(
+      f: ((action: UpdateAction, paths: Seq[os.Path]) => Unit) => Unit
+  )(using
       Progress
   ): CodeSearch =
-    val toUpdate = List.newBuilder[os.Path]
-    f(toUpdate.addAll(_))
-    val relativePaths = toUpdate.result()
+    val toIndex = List.newBuilder[os.Path]
+    val toDelete = List.newBuilder[os.Path]
+    f((action, paths) =>
+      action match
+        case UpdateAction.Delete  => toDelete ++= paths
+        case UpdateAction.Reindex => toIndex ++= paths
+    )
+    val pathsToIndex = toIndex.result()
+    val pathsToDelete = toDelete.result()
     val indexer = TrigramIndexer()
-    if relativePaths.nonEmpty then
+    if pathsToIndex.nonEmpty || pathsToDelete.nonEmpty then
       val builder = CodeSearch.load(config.indexerLocation)
-      relativePaths.foreach: absPath =>
+      pathsToDelete.foreach: absPath =>
+        builder.deleteFile(absPath)
+      pathsToIndex.foreach: absPath =>
         val entry = indexer.indexFile(absPath)
         builder.deleteFile(absPath)
         entry.foreach(builder.addEntry(_))

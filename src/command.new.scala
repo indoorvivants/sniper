@@ -37,7 +37,12 @@ def commandNew(context: Context, cli: CLI.New) =
 
   codesearch.withUpdater: updater =>
     template.foreach: tpl =>
-      updater(tpl.files.map(_.name).map(p => snippetBase / os.RelPath(p)))
+      updater(
+        UpdateAction.Reindex,
+        tpl.files
+          .map(_.name)
+          .map(p => snippetBase / os.RelPath(p))
+      )
 
   println(files.resolve(snippet.id))
 end commandNew
