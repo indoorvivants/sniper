@@ -19,7 +19,7 @@ class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
         pathResolver(loc.file) :* loc.line
   end search
 
-  def withUpdater(
+  def withUpdater(empty: Boolean)(
       f: ((action: UpdateAction, paths: Seq[os.Path]) => Unit) => Unit
   )(using
       Progress
@@ -35,7 +35,9 @@ class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
     val pathsToDelete = toDelete.result()
     val indexer = TrigramIndexer()
     if pathsToIndex.nonEmpty || pathsToDelete.nonEmpty then
-      val builder = CodeSearch.load(config.indexerLocation)
+      val builder =
+        if empty then TrigramIndexMutableBuilder.empty
+        else CodeSearch.load(config.indexerLocation)
       pathsToDelete.foreach: absPath =>
         builder.deleteFile(absPath)
       pathsToIndex.foreach: absPath =>

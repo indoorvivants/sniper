@@ -7,7 +7,7 @@ def commandSync(ctx: Context) =
 
   val snippetsToDelete = List.newBuilder[Long]
 
-  ctx.codesearch.withUpdater: updater =>
+  ctx.codesearch.withUpdater(empty = true): updater =>
     ctx.db
       .getAll()
       .foreach: snip =>

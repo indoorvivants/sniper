@@ -35,7 +35,7 @@ def commandNew(context: Context, cli: CLI.New) =
   import trigs.Progress
   given Progress = Progress.Quiet
 
-  codesearch.withUpdater: updater =>
+  codesearch.withUpdater(empty = false): updater =>
     template.foreach: tpl =>
       updater(
         UpdateAction.Reindex,
