@@ -27,5 +27,5 @@ def commandOpen(context: Context, cli: CLI.Open) =
         .find(_.id == value)
         .getOrElse(sys.error(s"Snippet with id $value not found"))
 
-  println(files.resolve(snippet.id))
+  print(files.resolve(snippet.id))
 end commandOpen

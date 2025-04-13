@@ -5,7 +5,8 @@ import com.monovore.decline.Command
 
 enum AlfredCommand derives CommandApplication:
   case Prepare(@Positional("query") query: String)
-  case Create(@Positional("query") query: String)
+  case Run(@Positional("query") query: String)
+  case Workflow
 
 @Help("Sniper is a command-line tool for managing code snippets.")
 @Name("sniper")

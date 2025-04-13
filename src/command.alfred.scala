@@ -79,6 +79,25 @@ def commandAlfred(ctx: Context, cli: AlfredCommand) =
   end handleOpen
 
   cli match
+    case AlfredCommand.Workflow =>
+      val isTTY = scalanative.posix.unistd.isatty(1) == 1
+
+      if isTTY then
+        sys.error(
+          "stdout is a TTY (a terminal) – please redirect the output of this command like this: `sniper alfred workflow > Sniper.alfredworkflow && open Sniper.alfredworkflow`"
+        )
+      else
+        val is =
+          this.getClass().getResourceAsStream("/Sniper.alfredworkflow")
+        val bytes = new Array[Byte](1024)
+        var length = 0
+        while { length = is.read(bytes); length } != -1 do
+          System.out.write(bytes, 0, length)
+        System.out.flush()
+        is.close()
+
+      end if
+
     case AlfredCommand.Prepare(query) =>
       val args = query.split(" ").toList.map(_.trim)
 
@@ -92,7 +111,7 @@ def commandAlfred(ctx: Context, cli: AlfredCommand) =
           handleIntro
       end match
 
-    case AlfredCommand.Create(query) =>
+    case AlfredCommand.Run(query) =>
       query.split(":").toList.map(_.trim) match
         case "new" :: templateName :: rest =>
           commandNew(
