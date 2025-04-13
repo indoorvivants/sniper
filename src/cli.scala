@@ -20,7 +20,7 @@ enum CLI derives CommandApplication:
       )
       template: Option[String]
   )
-  @Help("Open a picker for existing snippets") case Open
+  @Help("Open a picker for existing snippets") case Open(id: Option[Int])
 
   @Help("Delete selected snippets") case Delete
 

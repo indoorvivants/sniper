@@ -7,18 +7,27 @@ enum UpdateAction:
   case Delete, Reindex
 
 class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
-  def pathResolver(path: os.Path): (os.RelPath, Int) =
+  def pathResolver(path: os.Path): (path: os.RelPath, snippetId: Int) =
     val rel = path.relativeTo(config.codeDir)
     val first = rel.segments.head.toInt
     (path.relativeTo(config.codeDir / first.toString), first)
 
-  def search(query: String): List[(os.RelPath, Int, Int)] =
+  def search(query: String) =
     searchable
       .search(query)
       .map: (loc, _) =>
-        pathResolver(loc.file) :* loc.line
+        pathResolver(loc.file) ++ (line = loc.line)
   end search
 
+  /** Use this function to update/delete paths in codesearch index. After `f`
+    * finishes, index is written to the default location automatically.
+    *
+    * @param empty
+    *   when true, don't load the existing codesearch index, start with an empty
+    *   one instead
+    * @param f
+    * @return
+    */
   def withUpdater(empty: Boolean)(
       f: ((action: UpdateAction, paths: Seq[os.Path]) => Unit) => Unit
   )(using

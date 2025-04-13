@@ -19,48 +19,97 @@ def commandAlfred(ctx: Context, cli: AlfredCommand) =
     AlfredItem(s"ERROR: $msg", "", valid = false)
   )
 
+  def info(msgs: Seq[String]) = response(
+    msgs.map { msg =>
+      AlfredItem(title = msg, arg = "", valid = false)
+    }*
+  )
+
+  def handleIntro = info(Seq("Type new (or n), open (or o), code (or c)"))
+
+  def handleNew(args: Seq[String]) =
+    args match
+      case Nil =>
+        info(
+          ctx.config.templates
+            .map(_.name)
+        )
+      case templateName :: Nil =>
+        info(
+          ctx.config.templates
+            .map(_.name)
+            .filter(_.toLowerCase().contains(templateName))
+        )
+      case templateName :: rest =>
+        val snippetName = rest.mkString(" ")
+        val normalisedTemplateName = templateName.trim.toLowerCase
+        val normalisedSnippetName = snippetName.trim
+        ctx.config.templates.find(_.name == normalisedTemplateName) match
+          case None =>
+            error(s"No template named `$normalisedTemplateName` found")
+          case Some(value) =>
+            response(
+              AlfredItem(
+                title =
+                  s"Create snippet named `$normalisedSnippetName` using template `$normalisedTemplateName`",
+                arg = s"new:${value.name}:$normalisedSnippetName",
+                valid = true
+              )
+            )
+        end match
+    end match
+  end handleNew
+
+  def handleOpen(args: Seq[String]) =
+    val all = ctx.db.getAll()
+    val query = args.mkString(" ").toLowerCase.trim
+    val filtered = all.filter(snip =>
+      query.isEmpty() || snip.description.toLowerCase().contains(query)
+    )
+
+    response(
+      filtered.map(snip =>
+        AlfredItem(
+          title = s"Open `${snip.description}`",
+          arg = s"open:${snip.id}",
+          valid = true
+        )
+      )*
+    )
+  end handleOpen
+
   cli match
     case AlfredCommand.Prepare(query) =>
-      val templateQuery =
-        query.split(" ", 2).toList.map(_.trim) match
-          case templateName :: Nil =>
-            response(
-              ctx.config.templates
-                .map(_.name)
-                .filter(_.toLowerCase().contains(templateName))
-                .map(name =>
-                  AlfredItem(title = name, arg = name, valid = true)
-                )*
-            )
-          case templateName :: snippetName :: Nil =>
-            val normalisedTemplateName = templateName.trim.toLowerCase
-            val normalisedSnippetName = snippetName.trim
-            ctx.config.templates.find(_.name == normalisedTemplateName) match
-              case None =>
-                error(s"No template named `$normalisedTemplateName` found")
-              case Some(value) =>
-                response(
-                  AlfredItem(
-                    title =
-                      s"Create snippet named `$normalisedSnippetName` using template `$normalisedTemplateName`",
-                    arg = s"${value.name}:$normalisedSnippetName",
-                    valid = true
-                  )
-                )
-            end match
+      val args = query.split(" ").toList.map(_.trim)
 
-          case other => error(s"Unhandled case: $other")
+      args match
+        case ("n" | "new") :: next =>
+          handleNew(next)
+        case ("o" | "open") :: next =>
+          handleOpen(next)
+        case ("c" | "code") :: next => ???
+        case _ =>
+          handleIntro
+      end match
 
     case AlfredCommand.Create(query) =>
-      query.split(":", 2).toList.map(_.trim) match
-        case templateName :: snippetName :: Nil =>
+      query.split(":").toList.map(_.trim) match
+        case "new" :: templateName :: rest =>
           commandNew(
             ctx,
             CLI.New(
-              description = Some(snippetName),
+              description = Some(rest.mkString(":")),
               template = Some(templateName)
+            )
+          )
+        case "open" :: id :: Nil =>
+          commandOpen(
+            ctx,
+            CLI.Open(
+              id = Some(id.toInt)
             )
           )
         case other => error(s"Invalid query argument $query")
   end match
+
 end commandAlfred

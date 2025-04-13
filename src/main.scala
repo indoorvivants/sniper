@@ -28,7 +28,7 @@ import decline_derive.*, cue4s.*
         CommandApplication.parseOrExit[CLI | PrintCompletions](args) match
           case PrintCompletions(value) => print(value)
           case cli: CLI.New            => commandNew(context, cli)
-          case CLI.Open                => commandOpen(context)
+          case cli: CLI.Open           => commandOpen(context, cli)
           case CLI.Delete              => commandDelete(context)
           case CLI.Sync                => commandSync(context)
           case cli: CLI.Alfred         => commandAlfred(context, cli.command)
@@ -39,6 +39,7 @@ import decline_derive.*, cue4s.*
           case cli: CLI.TestTemplate => commandTestTemplate(context, cli)
         end match
   }
+  // scalafmt:on
 end snippets
 
 def setupScribe() =

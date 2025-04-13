@@ -12,25 +12,17 @@ def commandSync(ctx: Context) =
       .getAll()
       .foreach: snip =>
         val base = ctx.files.resolve(snip.id)
+        val files = ctx.db
+          .getFiles(snip.id)
+          .map(f => os.RelPath(f.filename))
+          .map(base / _)
         if !os.exists(base) then
           scribe.warn(
             s"Snippet ${snip.id} (${snip.description}) no longer exists, codesearch index will be deleted"
           )
           snippetsToDelete += snip.id
-          val files = ctx.db
-            .getFiles(snip.id)
-            .map(f => os.RelPath(f.filename))
-            .map(base / _)
-
           updater(UpdateAction.Delete, files)
-        else
-          val files = ctx.db
-            .getFiles(snip.id)
-            .map(_.filename)
-            .map(os.RelPath(_))
-            .map(base / _)
-
-          updater(UpdateAction.Reindex, files)
+        else updater(UpdateAction.Reindex, files)
         end if
   snippetsToDelete
     .result()
