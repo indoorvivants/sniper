@@ -30,3 +30,8 @@ bin: out/release out/flags/lto
 
 platform-bin: out/release out/flags/platform out/flags/lto
 	scala-cli package . -f -o out/release/sniper-$$(cat out/flags/platform) --native-mode release-fast $$(cat out/flags/lto)
+
+install: bin
+	echo "Installing ./out/release/sniper into /usr/local/bin/sniper"
+	echo "This command will be run with sudo, so your password may be required"
+	sudo install -m 755 out/release/sniper /usr/local/bin/sniper
