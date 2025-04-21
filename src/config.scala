@@ -26,8 +26,7 @@ case class Template(
     test: List[String] = Nil
 ) derives Codec
 
-case class AlfredIntegration(opencommand: String = "", shell: String = "sh")
-    derives Codec
+case class AlfredIntegration(opencommand: String = "") derives Codec
 
 case class Config(
     db: os.Path,
