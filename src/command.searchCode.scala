@@ -5,15 +5,15 @@ import trigs.InteractiveProgress
 def commandSearchCode(ctx: Context, cli: CLI.SearchCode) =
   var query = cli.query.getOrElse(ctx.prompts.text("Query").getOrThrow)
   var results = searchResults(ctx, query)
-  var stop = false
-  while !stop do
+  var commandResult = Option.empty[Result]
+  while commandResult.isEmpty do
     if results.isEmpty then
       ctx.clearTerminal()
       System.err.println(
         Console.BOLD + Console.RED + "No results" + Console.RESET
       )
       query = ctx.prompts.text("Query").getOrThrow
-      if query == "" then stop = true
+      if query == "" then commandResult = Some(Result.None)
       else results = searchResults(ctx, query)
     else
       val choice = ctx.prompts
@@ -23,7 +23,7 @@ def commandSearchCode(ctx: Context, cli: CLI.SearchCode) =
         .getOrThrow
         .trim
 
-      if choice == "q" then stop = true
+      if choice == "q" then commandResult = Some(Result.None)
       else if choice == "s" then
         ctx.clearTerminal()
         query = ctx.prompts.text("Query").getOrThrow
@@ -32,12 +32,15 @@ def commandSearchCode(ctx: Context, cli: CLI.SearchCode) =
         choice.toIntOption match
           case Some(value) if value >= 1 && value <= results.size =>
             val (filePath, snippetId, line) = results(value - 1)
-            print(ctx.files.resolve(snippetId) / filePath)
-            stop = true
+            commandResult = Some(
+              Result.Open(ctx.files.resolve(snippetId) / filePath)
+            )
           case _ => sys.error("invalid choice")
 
       end if
   end while
+
+  commandResult.getOrElse(Result.None)
 
 end commandSearchCode
 

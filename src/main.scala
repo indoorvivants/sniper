@@ -2,6 +2,18 @@ package sniper
 
 import decline_derive.*, cue4s.*
 
+enum Result:
+  case Open(path: os.Path)
+  case Out(contents: String)
+  case None
+
+  def print() =
+    this match
+      case Open(path)    => System.out.print(path)
+      case Out(contents) => System.out.print(contents)
+      case None          => ()
+end Result
+
 @main def snippets(args: String*) =
   setupScribe()
   val defaultLocations = DefaultLocations(os.home)
@@ -13,10 +25,10 @@ import decline_derive.*, cue4s.*
   val codesearch = CodeSearch(codesearchConfig)
   val terminal = AnsiTerminal(StderrOutput)
   // scalafmt:off
-  SnippetsDB.use(dbConfig) { db =>
+  val result = SnippetsDB.use(dbConfig) { db =>
     Prompts.sync
       .withOutput(StderrOutput)
-      .use: prompts =>
+      .use[Result]: prompts =>
         val context = Context(
           config,
           files,
@@ -26,7 +38,7 @@ import decline_derive.*, cue4s.*
           () => terminal.screenClear()
         )
         CommandApplication.parseOrExit[CLI | PrintCompletions](args) match
-          case PrintCompletions(value) => print(value)
+          case PrintCompletions(value) => Result.Out(value)
           case cli: CLI.New            => commandNew(context, cli)
           case cli: CLI.Open           => commandOpen(context, cli)
           case CLI.Delete              => commandDelete(context)
@@ -35,10 +47,12 @@ import decline_derive.*, cue4s.*
           case cli: CLI.SearchCode     => commandSearchCode(context, cli)
           case CLI.PrintConfig =>
             scribe.info(s"Config from [${defaultLocations.configFile}]")
-            pprint.pprintln(config)
+            Result.Out(pprint(config).toString)
           case cli: CLI.TestTemplate => commandTestTemplate(context, cli)
         end match
   }
+
+  result.print()
   // scalafmt:on
 end snippets
 

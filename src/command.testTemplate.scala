@@ -40,4 +40,6 @@ def commandTestTemplate(context: Context, cli: CLI.TestTemplate) =
 
     test(template)
   end if
+
+  Result.None
 end commandTestTemplate

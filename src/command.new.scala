@@ -1,6 +1,6 @@
 package sniper
 
-def commandNew(context: Context, cli: CLI.New) =
+def commandNew(context: Context, cli: CLI.New): Result.Open =
   import context.*
   val attrs =
     val description = cli.description.getOrElse(promptDescription(prompts))
@@ -44,5 +44,5 @@ def commandNew(context: Context, cli: CLI.New) =
           .map(p => snippetBase / os.RelPath(p))
       )
 
-  println(files.resolve(snippet.id))
+  Result.Open(files.resolve(snippet.id))
 end commandNew

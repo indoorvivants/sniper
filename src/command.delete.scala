@@ -29,4 +29,6 @@ def commandDelete(context: Context) =
         files.delete(snip.id)
     scribe.info(s"${ids.length} snippets deleted")
   end if
+
+  Result.None
 end commandDelete

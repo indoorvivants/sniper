@@ -10,8 +10,9 @@ case class AlfredResponse(items: List[AlfredItem])
     derives upickle.default.ReadWriter
 
 import upickle.default.*
-def commandAlfred(ctx: Context, cli: AlfredCommand) =
-  def response(items: AlfredItem*) = print(
+
+def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
+  def response(items: AlfredItem*) = Result.Out(
     write(AlfredResponse(items.toList))
   )
 
@@ -95,8 +96,8 @@ def commandAlfred(ctx: Context, cli: AlfredCommand) =
           System.out.write(bytes, 0, length)
         System.out.flush()
         is.close()
-
       end if
+      Result.None
 
     case AlfredCommand.Prepare(query) =>
       val args = query.split(" ").toList.map(_.trim)
@@ -112,23 +113,38 @@ def commandAlfred(ctx: Context, cli: AlfredCommand) =
       end match
 
     case AlfredCommand.Run(query) =>
+
+      def openPath(path: os.Path) =
+        val location = s"'${path.toString.replaceAll("'", raw"\'")}'"
+        val command = ctx.config.alfred.opencommand
+          .replace("{snippet_location}", location)
+
+        Result.Out(command)
+      end openPath
+
       query.split(":").toList.map(_.trim) match
         case "new" :: templateName :: rest =>
-          commandNew(
-            ctx,
-            CLI.New(
-              description = Some(rest.mkString(":")),
-              template = Some(templateName)
-            )
+          openPath(
+            commandNew(
+              ctx,
+              CLI.New(
+                description = Some(rest.mkString(":")),
+                template = Some(templateName)
+              )
+            ).path
           )
         case "open" :: id :: Nil =>
-          commandOpen(
-            ctx,
-            CLI.Open(
-              id = Some(id.toInt)
-            )
+          openPath(
+            commandOpen(
+              ctx,
+              CLI.Open(
+                id = Some(id.toInt)
+              )
+            ).path
           )
+
         case other => error(s"Invalid query argument $query")
+      end match
   end match
 
 end commandAlfred

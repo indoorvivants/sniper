@@ -1,6 +1,6 @@
 package sniper
 
-import toml.*
+import toml.*, derivation.*
 
 case class TemplateFile(
     name: String,
@@ -26,11 +26,15 @@ case class Template(
     test: List[String] = Nil
 ) derives Codec
 
+case class AlfredIntegration(opencommand: String = "", shell: String = "sh")
+    derives Codec
+
 case class Config(
     db: os.Path,
     data: os.Path,
     globalFiles: List[GlobalFile] = Nil,
-    templates: List[Template] = Nil
+    templates: List[Template] = Nil,
+    alfred: AlfredIntegration = AlfredIntegration()
 ) derives Codec:
   def validate =
     val allRefs = globalFiles.map(_.label)

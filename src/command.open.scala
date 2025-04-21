@@ -1,6 +1,6 @@
 package sniper
 
-def commandOpen(context: Context, cli: CLI.Open) =
+def commandOpen(context: Context, cli: CLI.Open): Result.Open =
   import context.*
   val all = db.getAll()
 
@@ -27,5 +27,5 @@ def commandOpen(context: Context, cli: CLI.Open) =
         .find(_.id == value)
         .getOrElse(sys.error(s"Snippet with id $value not found"))
 
-  print(files.resolve(snippet.id))
+  Result.Open(files.resolve(snippet.id))
 end commandOpen

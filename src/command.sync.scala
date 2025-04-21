@@ -29,4 +29,6 @@ def commandSync(ctx: Context) =
     .foreach: id =>
       scribe.info(s"Deleting snippet $id")
       ctx.db.delete(id)
+
+  Result.None
 end commandSync
