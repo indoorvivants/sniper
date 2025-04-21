@@ -40,7 +40,7 @@ enum CLI derives CommandApplication:
 
   @Name("print-config") @Help(
     "(for debugging) pretty print the configuration"
-  ) case PrintConfig
+  ) case PrintConfig(@Short("l") location: Boolean)
 
   @Name("test-template") @Help(
     "(for debugging) test templates specified in configuration"

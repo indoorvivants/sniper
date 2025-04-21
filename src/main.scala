@@ -31,6 +31,7 @@ end Result
       .use[Result]: prompts =>
         val context = Context(
           config,
+          defaultLocations,
           files,
           db,
           prompts,
@@ -45,10 +46,8 @@ end Result
           case CLI.Sync                => commandSync(context)
           case cli: CLI.Alfred         => commandAlfred(context, cli.command)
           case cli: CLI.SearchCode     => commandSearchCode(context, cli)
-          case CLI.PrintConfig =>
-            scribe.info(s"Config from [${defaultLocations.configFile}]")
-            Result.Out(pprint(config).toString)
-          case cli: CLI.TestTemplate => commandTestTemplate(context, cli)
+          case cli: CLI.PrintConfig    => commandPrintConfig(context, cli)
+          case cli: CLI.TestTemplate   => commandTestTemplate(context, cli)
         end match
   }
 
@@ -67,6 +66,7 @@ def setupScribe() =
 
 case class Context(
     config: Config,
+    defaultLocations: DefaultLocations,
     files: Files,
     db: SnippetsDB,
     prompts: SyncPrompts,
