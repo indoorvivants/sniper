@@ -3,7 +3,8 @@ package sniper
 case class AlfredItem(
     title: String,
     arg: String,
-    valid: Boolean
+    valid: Boolean,
+    subtitle: String = ""
 ) derives upickle.default.ReadWriter
 
 case class AlfredResponse(items: List[AlfredItem])
@@ -79,6 +80,24 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
     )
   end handleOpen
 
+  def handleSearch(args: Seq[String]) =
+    val results = searchResults(ctx, args.mkString(" "))
+    if results.isEmpty then error("No results :(")
+    else
+
+      response(
+        results.map(sr =>
+          AlfredItem(
+            title = sr.snippetTitle,
+            subtitle = sr.line.trim,
+            arg = s"sc:${sr.snippetId}:${sr.path}",
+            valid = true
+          )
+        )*
+      )
+    end if
+  end handleSearch
+
   cli match
     case AlfredCommand.Workflow =>
       val isTTY = scalanative.posix.unistd.isatty(1) == 1
@@ -107,7 +126,8 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
           handleNew(next)
         case ("o" | "open") :: next =>
           handleOpen(next)
-        case ("c" | "code") :: next => ???
+        case ("c" | "code") :: next =>
+          handleSearch(next)
         case _ =>
           handleIntro
       end match
@@ -141,6 +161,11 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
                 id = Some(id.toInt)
               )
             ).path
+          )
+
+        case "sc" :: id :: relPath :: Nil =>
+          openPath(
+            ctx.files.resolve(id.toLong) / relPath
           )
 
         case other => error(s"Invalid query argument $query")
