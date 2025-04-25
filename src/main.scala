@@ -25,10 +25,10 @@ end Result
   val codesearch = CodeSearch(codesearchConfig)
   val terminal = AnsiTerminal(StderrOutput)
   // scalafmt:off
-  val result = SnippetsDB.use(dbConfig) { db =>
+  val result: Result = SnippetsDB.use(dbConfig) { db =>
     Prompts.sync
       .withOutput(StderrOutput)
-      .use[Result]: prompts =>
+      .use: prompts =>
         val context = Context(
           config,
           defaultLocations,
@@ -50,7 +50,6 @@ end Result
           case cli: CLI.TestTemplate   => commandTestTemplate(context, cli)
         end match
   }
-
   result.print()
   // scalafmt:on
 end snippets

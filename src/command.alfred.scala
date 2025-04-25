@@ -4,27 +4,31 @@ case class AlfredItem(
     title: String,
     arg: String,
     valid: Boolean,
-    subtitle: String = ""
+    subtitle: String = "",
+    autocomplete: String = ""
 ) derives upickle.default.ReadWriter
 
-case class AlfredResponse(items: List[AlfredItem])
+case class AlfredResponse(items: Seq[AlfredItem])
     derives upickle.default.ReadWriter
 
 import upickle.default.*
 
-def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
-  def response(items: AlfredItem*) = Result.Out(
-    write(AlfredResponse(items.toList))
-  )
+def response(items: AlfredItem): Result = Result.Out(
+  write(AlfredResponse(List(items)))
+)
+def response(items: Seq[AlfredItem]): Result = Result.Out(
+  write(AlfredResponse(items))
+)
 
+def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
   def error(msg: String) = response(
     AlfredItem(s"ERROR: $msg", "", valid = false)
   )
 
   def info(msgs: Seq[String]) = response(
     msgs.map { msg =>
-      AlfredItem(title = msg, arg = "", valid = false)
-    }*
+      AlfredItem(title = msg, arg = "", valid = false, autocomplete = msg)
+    }
   )
 
   def handleIntro = info(Seq("Type new (or n), open (or o), code (or c)"))
@@ -32,9 +36,16 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
   def handleNew(args: Seq[String]) =
     args match
       case Nil =>
-        info(
+        response(
           ctx.config.templates
             .map(_.name)
+            .map: msg =>
+              AlfredItem(
+                title = msg,
+                valid = false,
+                autocomplete = s"new $msg ",
+                arg = ""
+              )
         )
       case templateName :: Nil =>
         info(
@@ -76,7 +87,7 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
           arg = s"open:${snip.id}",
           valid = true
         )
-      )*
+      )
     )
   end handleOpen
 
@@ -85,16 +96,35 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
     if results.isEmpty then error("No results :(")
     else
 
-      response(
-        results.map(sr =>
-          AlfredItem(
-            title = sr.snippetTitle,
-            subtitle = sr.line.trim,
-            arg = s"sc:${sr.snippetId}:${sr.path}",
-            valid = true
-          )
-        )*
-      )
+      val groupedResults =
+        val all = Seq.newBuilder[AlfredItem]
+        var curSnippetId: Long = -1
+        val curGroupBuilder = List.newBuilder[SearchResults]
+
+        def saveCurrent(): Unit =
+          curGroupBuilder.result() match
+            case results @ (h :: next) =>
+              all += AlfredItem(
+                title = h.snippetTitle,
+                subtitle = results.take(5).map(_.line.trim).mkString("\n"),
+                valid = true,
+                arg = s"sc:${h.snippetId}:${h.path}"
+              )
+            case Nil =>
+
+        results.foreach: sr =>
+          if curSnippetId != sr.snippetId then
+            saveCurrent()
+            curGroupBuilder.clear()
+            curSnippetId = sr.snippetId
+          else curGroupBuilder += sr
+
+        saveCurrent()
+
+        all.result()
+      end groupedResults
+
+      response(groupedResults)
     end if
   end handleSearch
 
