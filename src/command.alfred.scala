@@ -1,37 +1,31 @@
 package sniper
 
-case class AlfredItem(
-    title: String,
-    arg: String,
-    valid: Boolean,
-    subtitle: String = "",
-    autocomplete: String = ""
-) derives upickle.default.ReadWriter
-
-case class AlfredResponse(items: Seq[AlfredItem])
-    derives upickle.default.ReadWriter
-
-import upickle.default.*
-
-def response(items: AlfredItem): Result = Result.Out(
-  write(AlfredResponse(List(items)))
-)
-def response(items: Seq[AlfredItem]): Result = Result.Out(
-  write(AlfredResponse(items))
-)
+import AlfredProtocol.*
 
 def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
-  def error(msg: String) = response(
-    AlfredItem(s"ERROR: $msg", "", valid = false)
-  )
-
-  def info(msgs: Seq[String]) = response(
-    msgs.map { msg =>
-      AlfredItem(title = msg, arg = "", valid = false, autocomplete = msg)
-    }
-  )
-
-  def handleIntro = info(Seq("Type new (or n), open (or o), code (or c)"))
+  def handleIntro =
+    response(
+      Seq(
+        AlfredItem(
+          title = "new snippet (new or n)",
+          arg = "",
+          valid = false,
+          autocomplete = "new "
+        ),
+        AlfredItem(
+          title = "open snippet (open or o)",
+          arg = "",
+          valid = false,
+          autocomplete = "open "
+        ),
+        AlfredItem(
+          title = "code search (code or c)",
+          arg = "",
+          valid = false,
+          autocomplete = "code "
+        )
+      )
+    )
 
   def handleNew(args: Seq[String]) =
     args match
@@ -203,3 +197,35 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
   end match
 
 end commandAlfred
+
+object AlfredProtocol:
+  case class AlfredItem(
+      title: String,
+      arg: String,
+      valid: Boolean,
+      subtitle: String = "",
+      autocomplete: String = ""
+  ) derives upickle.default.ReadWriter
+
+  case class AlfredResponse(items: Seq[AlfredItem])
+      derives upickle.default.ReadWriter
+
+  import upickle.default.*
+
+  def response(items: AlfredItem): Result = Result.Out(
+    write(AlfredResponse(List(items)))
+  )
+  def response(items: Seq[AlfredItem]): Result = Result.Out(
+    write(AlfredResponse(items))
+  )
+
+  def error(msg: String) = response(
+    AlfredItem(s"ERROR: $msg", "", valid = false)
+  )
+
+  def info(msgs: Seq[String]) = response(
+    msgs.map { msg =>
+      AlfredItem(title = msg, arg = "", valid = false, autocomplete = msg)
+    }
+  )
+end AlfredProtocol
