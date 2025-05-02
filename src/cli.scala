@@ -29,6 +29,8 @@ enum CLI derives CommandApplication:
       command: AlfredCommand
   )
 
+  @Help("Start MCP server on stdin") case MCP
+
   @Name("search-code") @Help(
     "search code "
   ) case SearchCode(

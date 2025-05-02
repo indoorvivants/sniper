@@ -128,7 +128,8 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
 
       if isTTY then
         sys.error(
-          "stdout is a TTY (a terminal) – please redirect the output of this command like this: `sniper alfred workflow > Sniper.alfredworkflow && open Sniper.alfredworkflow`"
+          "stdout is a TTY (a terminal) – please redirect the output of this command like this: " +
+            "`sniper alfred workflow > Sniper.alfredworkflow && open Sniper.alfredworkflow`"
         )
       else
         val is =
@@ -189,7 +190,7 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
 
         case "sc" :: id :: relPath :: Nil =>
           openPath(
-            ctx.files.resolve(id.toLong) / relPath
+            ctx.files.resolve(id.toLong)
           )
 
         case other => error(s"Invalid query argument $query")

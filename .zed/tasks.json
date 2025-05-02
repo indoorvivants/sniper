@@ -1,0 +1,7 @@
+[
+  {
+    "label": "Install",
+    "command": "make install",
+    "use_new_terminal": true
+  }
+]

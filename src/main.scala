@@ -48,6 +48,7 @@ end Result
           case cli: CLI.SearchCode     => commandSearchCode(context, cli)
           case cli: CLI.PrintConfig    => commandPrintConfig(context, cli)
           case cli: CLI.TestTemplate   => commandTestTemplate(context, cli)
+          case CLI.MCP                 => commandMCP(context)
         end match
   }
   result.print()

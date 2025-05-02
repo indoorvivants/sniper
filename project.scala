@@ -1,4 +1,4 @@
-//> using scala 3.7.0-RC3
+//> using scala 3.7.0-RC4
 //> using platform scala-native
 //> using nativeVersion 0.5.7
 
@@ -13,5 +13,6 @@
 //> using dep com.lihaoyi::upickle::4.1.0
 //> using dep com.indoorvivants::trigs::0.0.2
 //> using dep com.indoorvivants::decline-completion::0.1.0
+//> using dep com.indoorvivants::mcp::0.1.0-SNAPSHOT
 //> using resourceDir ./resources
 //> using nativeEmbedResources
