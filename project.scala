@@ -13,6 +13,6 @@
 //> using dep com.lihaoyi::upickle::4.1.0
 //> using dep com.indoorvivants::trigs::0.0.2
 //> using dep com.indoorvivants::decline-completion::0.1.0
-//> using dep com.indoorvivants::mcp::0.1.0-SNAPSHOT
+//> using dep com.indoorvivants::mcp::0.0.3
 //> using resourceDir ./resources
 //> using nativeEmbedResources

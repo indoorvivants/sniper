@@ -19,8 +19,20 @@ def commandMCP(context: Context): Result =
             name = "sniper_list",
             description =
               Some("Produce a list of snippets in the database in JSON format"),
+            inputSchema = Tool.InputSchema()
+          ),
+          Tool(
+            name = "sniper_code_search",
+            description = Some(
+              "Search snippet files for a given query, response is a list of json objects, containing line number, line contents, snippet ID, and file path"
+            ),
             inputSchema = Tool.InputSchema(
-              `type` = "object"
+              properties = Some(
+                ujson.Obj(
+                  "query" -> ujson.Obj("type" -> ujson.Str("string"))
+                )
+              ),
+              required = Some(Seq("query"))
             )
           ),
           Tool(
@@ -35,8 +47,7 @@ def commandMCP(context: Context): Result =
                   "filePath" -> ujson.Obj("type" -> ujson.Str("string"))
                 )
               ),
-              required = Some(Seq("snippetId", "filePath")),
-              `type` = "object"
+              required = Some(Seq("snippetId", "filePath"))
             )
           )
         )
@@ -45,8 +56,15 @@ def commandMCP(context: Context): Result =
       req.params.name match
         case "sniper_list" =>
           CallToolResult(
-            Seq(TextContent(listSnippets(context), `type` = "text"))
+            Seq(TextContent(listSnippets(context)))
           )
+        case "sniper_code_search" =>
+          val query = req.params.arguments.get.obj("query").str
+          val results = searchResults(context, query)
+          CallToolResult(
+            Seq(TextContent(upickle.default.write(results)))
+          )
+
         case "sniper_read_file" =>
           val snippetId = req.params.arguments.get.obj("snippetId").num.toLong
           val filePath = req.params.arguments.get.obj("filePath").str
@@ -64,8 +82,7 @@ def commandMCP(context: Context): Result =
                 TextContent(
                   os.read(
                     context.files.resolve(snippetId) / os.RelPath(filePath)
-                  ),
-                  `type` = "text"
+                  )
                 )
               )
             )

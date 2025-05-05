@@ -45,11 +45,15 @@ def commandSearchCode(ctx: Context, cli: CLI.SearchCode) =
 end commandSearchCode
 
 case class SearchResults(
+    lineNumber: Int,
     line: String,
     snippetTitle: String,
     path: os.RelPath,
     snippetId: Long
-)
+) derives upickle.default.ReadWriter
+
+given upickle.default.ReadWriter[os.RelPath] =
+  upickle.default.readwriter[String].bimap(_.toString, os.RelPath(_))
 
 def printResults(res: List[SearchResults]) =
   var prevSnippetId = -1L
@@ -89,6 +93,7 @@ def searchResults(ctx: Context, query: String) =
       )
 
       resolved += SearchResults(
+        line,
         lines(line - 1),
         snippet.description,
         rp,
