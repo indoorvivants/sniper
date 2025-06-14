@@ -5,14 +5,14 @@ import mcp.*
 def commandMCP(context: Context): Result =
   val mcp = MCPBuilder
     .create()
-    .handleRequest(initialize): req =>
+    .handle(initialize): req =>
       InitializeResult(
         capabilities =
           ServerCapabilities(tools = Some(ServerCapabilities.Tools())),
-        protocolVersion = req.params.protocolVersion,
+        protocolVersion = req.protocolVersion,
         serverInfo = Implementation("sniper-mcp", "0.0.1")
       )
-    .handleRequest(tools.list): req =>
+    .handle(tools.list): req =>
       ListToolsResult(
         Seq(
           Tool(
@@ -52,22 +52,22 @@ def commandMCP(context: Context): Result =
           )
         )
       )
-    .handleRequest(tools.call): req =>
-      req.params.name match
+    .handle(tools.call): req =>
+      req.name match
         case "sniper_list" =>
           CallToolResult(
             Seq(TextContent(listSnippets(context)))
           )
         case "sniper_code_search" =>
-          val query = req.params.arguments.get.obj("query").str
+          val query = req.arguments.get.obj("query").str
           val results = searchResults(context, query)
           CallToolResult(
             Seq(TextContent(upickle.default.write(results)))
           )
 
         case "sniper_read_file" =>
-          val snippetId = req.params.arguments.get.obj("snippetId").num.toLong
-          val filePath = req.params.arguments.get.obj("filePath").str
+          val snippetId = req.arguments.get.obj("snippetId").num.toLong
+          val filePath = req.arguments.get.obj("filePath").str
           if !context.db.get(snippetId).nonEmpty then
             Error(ErrorCode.InvalidRequest, s"Snippet $snippetId not found")
           else if !context.db.getFiles(snippetId).exists(_.filename == filePath)
@@ -87,7 +87,7 @@ def commandMCP(context: Context): Result =
               )
             )
           end if
-    .process(System.in)
+    .run(SyncTransport.default)
   Result.None
 end commandMCP
 

@@ -32,20 +32,20 @@ enum CLI derives CommandApplication:
   @Help("Start MCP server on stdin") case MCP
 
   @Name("search-code") @Help(
-    "search code "
+    "search code of snippet files using trigam search"
   ) case SearchCode(
       @Short("q") query: Option[String],
       @Short("l") limit: Option[Int]
   )
 
-  case Sync
+  @Help("Synchronise code search index with contents on disk") case Sync
 
   @Name("print-config") @Help(
-    "(for debugging) pretty print the configuration"
+    "pretty print the configuration"
   ) case PrintConfig(@Short("l") location: Boolean)
 
   @Name("test-template") @Help(
-    "(for debugging) test templates specified in configuration"
+    " test templates specified in configuration"
   ) case TestTemplate(
       @Short("n") name: Option[String],
       @Short("a") all: Boolean

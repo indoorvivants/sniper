@@ -68,7 +68,7 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
   end handleNew
 
   def handleOpen(args: Seq[String]) =
-    val all = ctx.db.getAll()
+    val all = ctx.db.getAll().sortBy(_.id).reverse
     val query = args.mkString(" ").toLowerCase.trim
     val filtered = all.filter(snip =>
       query.isEmpty() || snip.description.toLowerCase().contains(query)
