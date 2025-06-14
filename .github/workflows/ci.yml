@@ -31,6 +31,9 @@ jobs:
         with:
           power: true
 
+      - name: Test boostrap
+        run: make test-bootstrap
+
       - name: Build the binary
         run: make platform-bin
 
@@ -63,6 +66,9 @@ jobs:
       - uses: VirtusLab/scala-cli-setup@main
         with:
           power: true
+
+      - name: Test boostrap
+        run: make test-bootstrap
 
       - name: Build the binary
         run: make platform-bin

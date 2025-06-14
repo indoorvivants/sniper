@@ -44,3 +44,6 @@ publish:
 	scala-cli config publish.credentials oss.sonatype.org env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
 	./.github/workflows/import-gpg.sh
 	scala-cli publish . --signer gpg --gpg-key 9D8EF0F74E5D78A3
+
+test-bootstrap: debug-bin
+	echo "FROM ubuntu\nCOPY ./out/debug/sniper /usr/bin/\nRUN sniper print-config" | docker build . -f -
