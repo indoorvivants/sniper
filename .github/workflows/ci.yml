@@ -78,7 +78,7 @@ jobs:
     name: Windows
     strategy:
       fail-fast: false
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       LLVM_BIN: 'C:\Program Files\LLVM\bin'
       LLVM_VERSION: "20.1.0"
@@ -131,7 +131,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [linux_build, windows_build, macos_build]
     name: Upload binaries to release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
         with:
