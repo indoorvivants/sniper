@@ -16,3 +16,14 @@
 //> using dep com.indoorvivants::mcp-quick::0.1.3
 //> using resourceDir ./resources
 //> using nativeEmbedResources
+
+//> using publish.computeVersion git:tag
+//> using publish.developers "velvetbaldmime|Anton Sviridov|https://indoorvivants.com"
+//> using publish.license Apache-2.0
+//> using publish.name sniper
+//> using publish.organization com.indoorvivants
+//> using publish.repository central
+//> using publish.secretKey env:PGP_SECRET
+//> using publish.secretKeyPassword env:PGP_PASSPHRASE
+//> using publish.url https://github.com/indoorvivants/sniper
+//> using publish.vcs github:indoorvivants/sniper
