@@ -16,6 +16,7 @@ def commandSearchCode(ctx: Context, cli: CLI.SearchCode) =
       if query == "" then commandResult = Some(Result.None)
       else results = searchResults(ctx, query).toArray
     else
+      printResults(results)
       val choice = ctx.prompts
         .text(
           s"Which result do you want to see? [1-${results.size}, 's' for new search, q for quit]"
@@ -55,7 +56,7 @@ case class SearchResults(
 given upickle.default.ReadWriter[os.RelPath] =
   upickle.default.readwriter[String].bimap(_.toString, os.RelPath(_))
 
-def printResults(res: List[SearchResults]) =
+def printResults(res: Iterable[SearchResults]) =
   var prevSnippetId = -1L
   val resultsCount = res.size
   val formatNum =
