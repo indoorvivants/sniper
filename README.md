@@ -15,8 +15,10 @@
 
 Snippet management tool for the terminal.
 
-**This software is classified as _blabware_ – designed primarily for a talk or a blog post. Even though I daily
-drive it, it's not advertised to wider public and it follows my personal workflow. That said, if you find it useful and want to fix some bugs**
+**This software is classified as _blabware_ – designed primarily for a talk (and [here are the slides](https://slides.indoorvivants.com/clis-with-scala-native/1)) or a blog post. Even though I daily
+drive it, it's not advertised to wider public and it follows my personal workflow. That said, if you find it useful and want to fix some bugs, let me know!**
+
+https://github.com/user-attachments/assets/ccfbb54a-dda2-4541-83f2-e6822b9bc01e
 
 ## Getting started
 
@@ -113,6 +115,10 @@ https://www.alfredapp.com/
 `sniper alfred workflow > hello.alfredworkflow`
 
 Then open that `hello.alfredworkflow` file to add it to your installation
+
+
+https://github.com/user-attachments/assets/9a39c541-0e86-4390-9e75-5a76c489f543
+
 
 ### Model Context Protocol
 
