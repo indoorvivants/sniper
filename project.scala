@@ -3,7 +3,7 @@
 //> using nativeVersion 0.5.8
 
 //> using dep com.github.lolgab::magnum::1.3.1
-//> using dep com.github.lolgab::scala-native-jdbc-sqlite::0.0.3
+//> using dep com.github.lolgab::scala-native-jdbc-sqlite::0.0.4
 //> using dep com.indoorvivants::decline-derive::0.3.1
 //> using dep tech.neander::cue4s::0.0.9
 //> using dep com.indoorvivants::toml::0.3.0
