@@ -3,22 +3,19 @@ package sniper
 import com.augustnagro.magnum.*
 
 case class SnippetAttributes(
-    description: String,
-    uid: Option[String] = None
+    description: String
 )
 
 @Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
 case class Snippet(
     @Id id: Long,
-    description: String,
-    uid: Option[String]
+    description: String
 ) derives DbCodec
 
 case class SnippetFileAttributes(
     snippetId: Long,
     filename: String,
-    code: String,
-    uid: Option[String] = None
+    code: String
 )
 
 @Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
@@ -26,8 +23,7 @@ case class SnippetFile(
     @Id id: Long,
     snippetId: Long,
     filename: String,
-    code: String,
-    uid: Option[String]
+    code: String
 ) derives DbCodec
 
 object SnippetFile:
@@ -47,18 +43,7 @@ class SnippetsDB private (using DbCon):
 
   def add(attrs: SnippetAttributes): Snippet =
     val rand = randomString()
-    snippetsRepo.insert(
-      attrs.copy(uid = Some(rand))
-    )
-    // TODO: when sqlite-jdbc-native supports prepared statements with returning,
-    // remove uid and all logic surrounding it
-    val id = sql"select id from snippet where uid = $rand"
-      .query[Long]
-      .run()
-      .headOption
-      .getOrElse(sys.error("Snippet not found"))
-
-    snippetsRepo.findById(id).getOrElse(sys.error("Snippet not found"))
+    snippetsRepo.insertReturning(attrs)
   end add
 
   def delete(id: Long) =
@@ -75,23 +60,11 @@ class SnippetsDB private (using DbCon):
       snippetId: Long,
       files: Map[String, String]
   ): Vector[SnippetFile] =
-    val sorted = files.toList.sortBy(_._1)
-    val uids = Vector.newBuilder[String]
-
+    val sorted = files.toVector.sortBy(_._1)
     sorted.map { case (filename, code) =>
       val attrs = SnippetFileAttributes(snippetId, filename, code)
-      val uid = randomString()
-      uids += uid
-      snippetFilesRepo.insert(attrs.copy(uid = Some(uid)))
+      snippetFilesRepo.insertReturning(attrs)
     }
-
-    // TODO: figure out how to do IN(...) queries
-    uids.result.map: uid =>
-      sql"select ${SnippetFile.Table.all} from ${SnippetFile.Table} where uid = $uid"
-        .query[SnippetFile]
-        .run()
-        .headOption
-        .getOrElse(sys.error("Snippet file not found"))
   end addFilesToSnippet
 end SnippetsDB
 
