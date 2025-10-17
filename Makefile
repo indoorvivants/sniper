@@ -37,12 +37,14 @@ install: bin
 	sudo install -m 755 out/release/sniper /usr/local/bin/sniper
 
 publish-snapshot:
-	scala-cli config publish.credentials oss.sonatype.org env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
+	scala-cli config publish.credentials central.sonatype.com env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
+	scala-cli config publish.credentials ossrh-staging-api.central.sonatype.com env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
 	scala-cli publish . --signer none
 
 publish:
-	scala-cli config publish.credentials oss.sonatype.org env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
-	./.github/workflows/import-gpg.sh
+	scala-cli config publish.credentials central.sonatype.com env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
+	scala-cli config publish.credentials ossrh-staging-api.central.sonatype.com env:SONATYPE_USERNAME env:SONATYPE_PASSWORD
+    ./.github/workflows/import-gpg.sh
 	scala-cli publish . --signer gpg --gpg-key 9D8EF0F74E5D78A3
 
 test-bootstrap: debug-bin
