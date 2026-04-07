@@ -38,8 +38,6 @@ jobs:
       - name: Build the binary
         run: |
           make platform-bin
-          make bin
-          ./out/release/sniper print-config
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
