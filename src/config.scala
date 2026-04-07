@@ -87,6 +87,6 @@ private given Codec[os.Path] with
       index: Int
   ): Either[Parse.Error, os.Path] = value match
     case Value.Str(value) => Right(os.Path(value))
-    case value =>
+    case value            =>
       Left((List.empty, s"String expected, $value provided"))
 end given

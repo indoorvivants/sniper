@@ -21,7 +21,7 @@ def commandOpen(context: Context, cli: CLI.Open): Result.Open =
   end selectSnippet
 
   val snippet = cli.id match
-    case None => selectSnippet
+    case None        => selectSnippet
     case Some(value) =>
       all
         .find(_.id == value)

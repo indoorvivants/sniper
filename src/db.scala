@@ -50,8 +50,9 @@ class SnippetsDB private (using DbCon):
     snippetsRepo.deleteById(id)
 
   def getFiles(snippetId: Long): Vector[SnippetFile] =
-    sql"select ${SnippetFile.Table.all} from ${SnippetFile
-        .Table} where snippet_id = $snippetId".query[SnippetFile].run()
+    sql"select ${SnippetFile.Table.all} from ${SnippetFile.Table} where snippet_id = $snippetId"
+      .query[SnippetFile]
+      .run()
 
   def removeFilesFromSnippet(files: Vector[SnippetFile]) = snippetFilesRepo
     .deleteAll(files)
@@ -98,6 +99,5 @@ private val sqlLogger =
      |""".stripMargin
 
     def log(successEvent: SqlSuccessEvent): Unit = scribe.debug(
-      s"Executed Query in ${successEvent.execTime}\n${successEvent.sql}"
-        .stripMargin
+      s"Executed Query in ${successEvent.execTime}\n${successEvent.sql}".stripMargin
     )
