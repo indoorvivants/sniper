@@ -26,3 +26,4 @@ test-out
 compile_flags.txt
 build
 out
+.vscode

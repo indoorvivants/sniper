@@ -86,39 +86,66 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
   end handleOpen
 
   def handleSearch(args: Seq[String]) =
-    val results = searchResults(ctx, args.mkString(" "))
+    val results = searchResults(ctx, args.mkString(" "), 10)
     if results.isEmpty then error("No results :(")
     else
+      // val groupedResults =
+      //   val all = Seq.newBuilder[AlfredItem]
+      //   var curSnippetId: Long = -1
+      //   val curGroupBuilder = List.newBuilder[Snippet]
 
-      val groupedResults =
-        val all = Seq.newBuilder[AlfredItem]
-        var curSnippetId: Long = -1
-        val curGroupBuilder = List.newBuilder[SearchResults]
+      //   // def saveCurrent(): Unit =
+      //   //   curGroupBuilder.result() match
+      //   //     case results @ (h :: next) =>
+      //   //       all += AlfredItem(
+      //   //         title = h.snippetTitle,
+      //   //         subtitle = results.take(5).map(_.line.trim).mkString("\n"),
+      //   //         valid = true,
+      //   //         arg = s"sc:${h.snippetId}:${h.path}"
+      //   //       )
+      //   //     case Nil =>
 
-        def saveCurrent(): Unit =
-          curGroupBuilder.result() match
-            case results @ (h :: next) =>
-              all += AlfredItem(
-                title = h.snippetTitle,
-                subtitle = results.take(5).map(_.line.trim).mkString("\n"),
+      //   results.foreach: sr =>
+      //     if curSnippetId != sr.snippetId then
+      //       saveCurrent()
+      //       curGroupBuilder.clear()
+      //       curSnippetId = sr.snippetId
+      //     else curGroupBuilder += sr
+
+      //   saveCurrent()
+
+      //   all.result()
+      // end groupedResults
+      //
+      val alfredItems = results.flatMap:
+        sr =>
+          sr.locations
+            .groupBy(_.path)
+            .toArray
+            .sortBy(_._2.map(_.score).sum * -1)
+            .map: (path, locations) =>
+              AlfredItem(
+                title = s"${sr.snippetTitle} ($path)",
+                subtitle = locations.map(_.line).mkString("\n"),
                 valid = true,
-                arg = s"sc:${h.snippetId}:${h.path}"
+                arg = s"sc:${sr.snippetId}:${path}"
               )
-            case Nil =>
 
-        results.foreach: sr =>
-          if curSnippetId != sr.snippetId then
-            saveCurrent()
-            curGroupBuilder.clear()
-            curSnippetId = sr.snippetId
-          else curGroupBuilder += sr
+          // AlfredItem(
+          //   title = sr.snippetTitle,
+          //   subtitle = sr,
+          //   valid = true,
+          //   arg = s"sc:${sr.snippetId}:${sr}"
+          // )
 
-        saveCurrent()
+      //   //       all += AlfredItem(
+      //   //         title = h.snippetTitle,
+      //   //         subtitle = results.take(5).map(_.line.trim).mkString("\n"),
+      //   //         valid = true,
+      //   //         arg = s"sc:${h.snippetId}:${h.path}"
+      //   //       )
 
-        all.result()
-      end groupedResults
-
-      response(groupedResults)
+      response(alfredItems)
     end if
   end handleSearch
 

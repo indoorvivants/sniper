@@ -3,10 +3,17 @@ package sniper
 import decline_derive.*
 import com.monovore.decline.Command
 
-enum AlfredCommand derives CommandApplication:
-  case Prepare(@Positional("query") query: String)
-  case Run(@Positional("query") query: String)
+enum AlfredCommand derives CommandApplication, CanEqual:
+  case Prepare(
+      @Positional("query")
+      query: String
+  )
+  case Run(
+      @Positional("query")
+      query: String
+  )
   case Workflow
+end AlfredCommand
 
 @Help("Sniper is a command-line tool for managing code snippets.")
 @Name("sniper")
@@ -25,30 +32,35 @@ enum CLI derives CommandApplication:
 
   @Help("Delete selected snippets") case Delete
 
-  @Help("Alfred workflow picker") case Alfred(
-      command: AlfredCommand
-  )
+  @Help("Alfred workflow picker") case Alfred(command: AlfredCommand)
 
   @Help("Start MCP server on stdin") case MCP
 
   @Name("search-code") @Help(
     "search code of snippet files using trigam search"
   ) case SearchCode(
-      @Short("q") query: Option[String],
-      @Short("l") limit: Option[Int]
+      @Short("q")
+      query: Option[String],
+      @Short("l")
+      limit: Option[Int]
   )
 
   @Help("Synchronise code search index with contents on disk") case Sync
 
   @Name("print-config") @Help(
     "pretty print the configuration"
-  ) case PrintConfig(@Short("l") location: Boolean)
+  ) case PrintConfig(
+      @Short("l")
+      location: Boolean
+  )
 
   @Name("test-template") @Help(
     " test templates specified in configuration"
   ) case TestTemplate(
-      @Short("n") name: Option[String],
-      @Short("a") all: Boolean
+      @Short("n")
+      name: Option[String],
+      @Short("a")
+      all: Boolean
   )
 end CLI
 
@@ -65,23 +77,21 @@ given withCompletions[T](using
     val newSubcommands =
       val bash =
         Command("bash", "output autocompletion script for bash")(
-          Opts(
-            PrintCompletions(Completion.bashCompletion(command))
-          )
+          Opts(PrintCompletions(Completion.bashCompletion(command)))
         )
 
-      val zsh = Command("zsh", "output autocompletion script for zsh")(
-        Opts(
-          PrintCompletions(Completion.zshBashcompatCompletion(command))
+      val zsh =
+        Command("zsh", "output autocompletion script for zsh")(
+          Opts(PrintCompletions(Completion.zshBashcompatCompletion(command)))
         )
-      )
 
-      val completion = Command(
-        "completion",
-        "output autocompletion scripts for common shells"
-      ) {
-        Opts.subcommands(bash, zsh)
-      }
+      val completion =
+        Command(
+          "completion",
+          "output autocompletion scripts for common shells"
+        ) {
+          Opts.subcommands(bash, zsh)
+        }
 
       t.subcommands :+ completion
     end newSubcommands

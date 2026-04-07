@@ -2,7 +2,7 @@ package sniper
 
 import decline_derive.*, cue4s.*
 
-enum Result:
+enum Result derives CanEqual:
   case Open(path: os.Path)
   case Out(contents: String)
   case None

@@ -2,13 +2,12 @@ package sniper
 
 import com.augustnagro.magnum.*
 
-case class SnippetAttributes(
-    description: String
-)
+case class SnippetAttributes(description: String)
 
 @Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
 case class Snippet(
-    @Id id: Long,
+    @Id
+    id: Long,
     description: String
 ) derives DbCodec
 
@@ -20,7 +19,8 @@ case class SnippetFileAttributes(
 
 @Table(SqliteDbType, SqlNameMapper.CamelToSnakeCase)
 case class SnippetFile(
-    @Id id: Long,
+    @Id
+    id: Long,
     snippetId: Long,
     filename: String,
     code: String
@@ -32,11 +32,9 @@ object SnippetFile:
 class SnippetsDB private (using DbCon):
   private val snippetsRepo = Repo[SnippetAttributes, Snippet, Long]
   private val snippetFilesRepo = Repo[SnippetFileAttributes, SnippetFile, Long]
-  def getAll(): Vector[Snippet] =
-    snippetsRepo.findAll
+  def getAll(): Vector[Snippet] = snippetsRepo.findAll
 
-  def get(id: Long): Option[Snippet] =
-    snippetsRepo.findById(id)
+  def get(id: Long): Option[Snippet] = snippetsRepo.findById(id)
 
   private def randomString() =
     sql"select random()".query[Int].run().head.toString
@@ -52,9 +50,11 @@ class SnippetsDB private (using DbCon):
     snippetsRepo.deleteById(id)
 
   def getFiles(snippetId: Long): Vector[SnippetFile] =
-    sql"select ${SnippetFile.Table.all} from ${SnippetFile.Table} where snippet_id = $snippetId"
-      .query[SnippetFile]
-      .run()
+    sql"select ${SnippetFile.Table.all} from ${SnippetFile
+        .Table} where snippet_id = $snippetId".query[SnippetFile].run()
+
+  def removeFilesFromSnippet(files: Vector[SnippetFile]) = snippetFilesRepo
+    .deleteAll(files)
 
   def addFilesToSnippet(
       snippetId: Long,
@@ -80,25 +80,24 @@ object SnippetsDB:
     connect(xa):
       sql"""
       CREATE TABLE IF NOT EXISTS snippet (id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, uid TEXT)
-      """.update
-        .run()
+      """.update.run()
       sql"""
       CREATE TABLE IF NOT EXISTS snippet_file (id INTEGER PRIMARY KEY AUTOINCREMENT, snippet_id NUMBER, filename TEXT, code TEXT, uid TEXT)
-      """.update
-        .run()
+      """.update.run()
       f(new SnippetsDB)
   end use
 end SnippetsDB
 
-private val sqlLogger = new SqlLogger:
-  def exceptionMsg(exceptionEvent: SqlExceptionEvent): String =
-    s"""Error executing query:
+private val sqlLogger =
+  new SqlLogger:
+    def exceptionMsg(exceptionEvent: SqlExceptionEvent): String =
+      s"""Error executing query:
      |${exceptionEvent.sql}
      |With message:
      |${exceptionEvent.cause}
      |""".stripMargin
 
-  def log(successEvent: SqlSuccessEvent): Unit =
-    scribe.debug(
-      s"Executed Query in ${successEvent.execTime}\n${successEvent.sql}".stripMargin
+    def log(successEvent: SqlSuccessEvent): Unit = scribe.debug(
+      s"Executed Query in ${successEvent.execTime}\n${successEvent.sql}"
+        .stripMargin
     )

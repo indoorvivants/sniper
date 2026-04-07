@@ -3,7 +3,7 @@ package sniper
 import trigs.*
 import os.Path
 
-enum UpdateAction:
+enum UpdateAction derives CanEqual:
   case Delete, Reindex
 
 class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
@@ -15,8 +15,8 @@ class CodeSearch private (config: CodeSearch.Config, searchable: Searchable):
   def search(query: String) =
     searchable
       .search(query)
-      .map: (loc, _) =>
-        pathResolver(loc.file) ++ (line = loc.line)
+      .map: (loc, score) =>
+        pathResolver(loc.file) ++ (line = loc.line, score = score)
   end search
 
   /** Use this function to update/delete paths in codesearch index. After `f`
