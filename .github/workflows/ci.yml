@@ -111,36 +111,20 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
+      - uses: coursier/cache-action@v6
+
       - uses: sbt/setup-sbt@v1
+
+      - name: Cache SBT
+        uses: actions/cache@v5
+        with:
+          path: |
+            %LocalAppData%\sbt\v2
+          key: ${{ matrix.OS }}-sbt2
 
       - name: Build the binary
         run: |
           sbt buildBinaryPlatformRelease
-
-      # # See https://github.com/scala-native/scala-native/blob/master/.github/actions/windows-setup-env/action.yml#L14 SN_RELE
-      # # for details
-      # - name: Configure Pagefile
-      #   uses: al-cheb/configure-pagefile-action@v1.2
-      #   with:
-      #     minimum-size: 4GB
-      #     maximum-size: 16GB
-
-      # - uses: coursier/cache-action@v6
-
-      # - uses: VirtusLab/scala-cli-setup@main
-      #   with:
-      #     power: true
-
-      # - name: Install clang and make
-      #   shell: pwsh
-      #   run: |
-      #     choco install llvm --version="$Env:LLVM_VERSION" --allow-downgrade
-      #     choco install make
-      #     clang --version
-
-      # - name: Build binary (windows)
-      #   run: make platform-bin
-      #   shell: bash
 
       # - name: Upload artifacts
       #   uses: actions/upload-artifact@v4
