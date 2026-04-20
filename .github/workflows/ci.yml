@@ -149,21 +149,18 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - uses: sbt/setup-sbt@v1
+
       - uses: coursier/cache-action@v6
 
-      - uses: VirtusLab/scala-cli-setup@main
+      - name: Cache SBT
+        uses: actions/cache@v5
         with:
-          power: true
+          path: |
+            ~/.cache/sbt/v2
+          key: ubuntu-22.04-sbt2
 
-      - name: Publish snapshot
-        if: github.ref == 'refs/heads/main'
-        run: sbt ci-release
-        env:
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-
-      - name: Publish
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Publish to Maven
         run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
