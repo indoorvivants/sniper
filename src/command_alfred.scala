@@ -45,7 +45,11 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
         info(
           ctx.config.templates
             .map(_.name)
-            .filter(_.toLowerCase().contains(templateName))
+            .filter(
+              _.toLowerCase()
+                .contains(templateName)
+            )
+            .map("new " + _)
         )
       case templateName :: rest =>
         val snippetName = rest.mkString(" ")
@@ -89,62 +93,18 @@ def commandAlfred(ctx: Context, cli: AlfredCommand): Result =
     val results = searchResults(ctx, args.mkString(" "), 10)
     if results.isEmpty then error("No results :(")
     else
-      // val groupedResults =
-      //   val all = Seq.newBuilder[AlfredItem]
-      //   var curSnippetId: Long = -1
-      //   val curGroupBuilder = List.newBuilder[Snippet]
-
-      //   // def saveCurrent(): Unit =
-      //   //   curGroupBuilder.result() match
-      //   //     case results @ (h :: next) =>
-      //   //       all += AlfredItem(
-      //   //         title = h.snippetTitle,
-      //   //         subtitle = results.take(5).map(_.line.trim).mkString("\n"),
-      //   //         valid = true,
-      //   //         arg = s"sc:${h.snippetId}:${h.path}"
-      //   //       )
-      //   //     case Nil =>
-
-      //   results.foreach: sr =>
-      //     if curSnippetId != sr.snippetId then
-      //       saveCurrent()
-      //       curGroupBuilder.clear()
-      //       curSnippetId = sr.snippetId
-      //     else curGroupBuilder += sr
-
-      //   saveCurrent()
-
-      //   all.result()
-      // end groupedResults
-      //
-      val alfredItems = results.flatMap:
-        sr =>
-          sr.locations
-            .groupBy(_.path)
-            .toArray
-            .sortBy(_._2.map(_.score).sum * -1)
-            .map: (path, locations) =>
-              AlfredItem(
-                title = s"${sr.snippetTitle} ($path)",
-                subtitle = locations.map(_.line).mkString("\n"),
-                valid = true,
-                arg = s"sc:${sr.snippetId}:${path}"
-              )
-
-          // AlfredItem(
-          //   title = sr.snippetTitle,
-          //   subtitle = sr,
-          //   valid = true,
-          //   arg = s"sc:${sr.snippetId}:${sr}"
-          // )
-
-      //   //       all += AlfredItem(
-      //   //         title = h.snippetTitle,
-      //   //         subtitle = results.take(5).map(_.line.trim).mkString("\n"),
-      //   //         valid = true,
-      //   //         arg = s"sc:${h.snippetId}:${h.path}"
-      //   //       )
-
+      val alfredItems = results.flatMap: sr =>
+        sr.locations
+          .groupBy(_.path)
+          .toArray
+          .sortBy(_._2.map(_.score).sum * -1)
+          .map: (path, locations) =>
+            AlfredItem(
+              title = s"${sr.snippetTitle} ($path)",
+              subtitle = locations.map(_.line).mkString("\n"),
+              valid = true,
+              arg = s"sc:${sr.snippetId}:${path}"
+            )
       response(alfredItems)
     end if
   end handleSearch
