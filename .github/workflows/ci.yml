@@ -120,7 +120,7 @@ jobs:
         with:
           path: |
             %LocalAppData%\sbt\v2
-          key: ${{ matrix.OS }}-sbt2
+          key: ${{ runner. }}-sbt2
 
       - name: Build the binary
         run: |
