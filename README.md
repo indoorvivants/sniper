@@ -30,9 +30,9 @@ https://github.com/user-attachments/assets/ccfbb54a-dda2-4541-83f2-e6822b9bc01e
 
 - Via GitHub releases: download the latest binary for your platform
   
-- From source: clone the repository and run `make install`. 
+- From source: clone the repository and run `sbt buildBinaryRelease` which will produce `./out/release/sniper`. 
   
-  Requires [Scala CLI](https://scala-cli.virtuslab.org/) and [Clang](https://clang.llvm.org/) to be installed
+  Requires [SBT](https://scala-sbt.org/) and [Clang](https://clang.llvm.org/) to be installed
 
 ### Usage
 

@@ -29,15 +29,20 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - uses: sbt/setup-sbt@v1
+
       - uses: coursier/cache-action@v6
 
-      - uses: VirtusLab/scala-cli-setup@main
+      - name: Cache SBT
+        uses: actions/cache@v5
         with:
-          power: true
+          path: |
+            ~/Library/Caches/sbt/v2
+          key: ${{ matrix.OS }}-sbt2
 
       - name: Build the binary
         run: |
-          make platform-bin
+          sbt buildBinaryPlatformRelease
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -63,17 +68,20 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
+      - uses: sbt/setup-sbt@v1
+
       - uses: coursier/cache-action@v6
 
-      - uses: VirtusLab/scala-cli-setup@main
+      - name: Cache SBT
+        uses: actions/cache@v5
         with:
-          power: true
-
-      - name: Test boostrap
-        run: make test-bootstrap
+          path: |
+            ~/.cache/sbt/v2
+          key: ${{ matrix.OS }}-sbt2
 
       - name: Build the binary
-        run: make platform-bin
+        run: |
+          sbt buildBinaryPlatformRelease
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -96,37 +104,27 @@ jobs:
       - name: Setup git config
         run: git config --global core.autocrlf false
 
-      # - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # - uses: actions/setup-java@v4
-      #   with:
-      #     distribution: "temurin"
-      #     java-version: "21"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
 
-      # # See https://github.com/scala-native/scala-native/blob/master/.github/actions/windows-setup-env/action.yml#L14 SN_RELE
-      # # for details
-      # - name: Configure Pagefile
-      #   uses: al-cheb/configure-pagefile-action@v1.2
-      #   with:
-      #     minimum-size: 4GB
-      #     maximum-size: 16GB
+      - uses: coursier/cache-action@v6
 
-      # - uses: coursier/cache-action@v6
+      - uses: sbt/setup-sbt@v1
 
-      # - uses: VirtusLab/scala-cli-setup@main
-      #   with:
-      #     power: true
+      - name: Cache SBT
+        uses: actions/cache@v5
+        with:
+          path: |
+            %LocalAppData%\sbt\v2
+          key: ${{ runner.os }}-sbt2
 
-      # - name: Install clang and make
-      #   shell: pwsh
-      #   run: |
-      #     choco install llvm --version="$Env:LLVM_VERSION" --allow-downgrade
-      #     choco install make
-      #     clang --version
-
-      # - name: Build binary (windows)
-      #   run: make platform-bin
-      #   shell: bash
+      - name: Build the binary
+        run: |
+          sbt buildBinaryPlatformRelease
 
       # - name: Upload artifacts
       #   uses: actions/upload-artifact@v4
@@ -159,14 +157,14 @@ jobs:
 
       - name: Publish snapshot
         if: github.ref == 'refs/heads/main'
-        run: make publish-snapshot
+        run: sbt ci-release
         env:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
 
       - name: Publish
         if: startsWith(github.ref, 'refs/tags/v')
-        run: make publish
+        run: sbt ci-release
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
