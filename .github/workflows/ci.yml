@@ -115,7 +115,7 @@ jobs:
 
       - name: Build the binary
         run: |
-          sbt buildPlatformBinaryRelease
+          sbt buildBinaryPlatformRelease
 
       # # See https://github.com/scala-native/scala-native/blob/master/.github/actions/windows-setup-env/action.yml#L14 SN_RELE
       # # for details
