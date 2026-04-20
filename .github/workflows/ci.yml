@@ -33,6 +33,13 @@ jobs:
 
       - uses: coursier/cache-action@v6
 
+      - name: Cache SBT
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/Library/Caches/sbt/v2
+          key: ${{ matrix.OS }}-sbt2
+
       - name: Build the binary
         run: |
           sbt buildBinaryPlatformRelease
@@ -64,6 +71,13 @@ jobs:
       - uses: sbt/setup-sbt@v1
 
       - uses: coursier/cache-action@v6
+
+      - name: Cache SBT
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cache/sbt/v2
+          key: ${{ matrix.OS }}-sbt2
 
       - name: Build the binary
         run: |
