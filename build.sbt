@@ -1,6 +1,8 @@
 import com.indoorvivants.detective.Platform
 import scala.scalanative.build.*
 
+name := "sniper"
+
 scalaVersion := "3.8.3"
 
 enablePlugins(ScalaNativePlugin)
@@ -52,6 +54,7 @@ scalacOptions ++= Seq("-language:strictEquality", "-language:experimental.strict
 
 inThisBuild(
   List(
+    organization := "com.indoorvivants",
     homepage := Some(url("https://github.com/indoorvivants/sniper")),
     licenses := List(
       "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")
