@@ -3,7 +3,7 @@ package sniper
 import cue4s.*
 
 object StderrOutput extends Output:
-  override def logLn[A: AsString](a: A): Unit = ()
+  override def logLn[A: AsString](a: => A): Unit = ()
   override def out[A: AsString](a: A): Unit =
     System.err.print(a.render)
     System.err.flush()

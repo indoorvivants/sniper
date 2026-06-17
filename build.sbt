@@ -3,7 +3,7 @@ import scala.scalanative.build.*
 
 name := "sniper"
 
-scalaVersion := "3.8.3"
+scalaVersion := "3.8.4"
 
 enablePlugins(ScalaNativePlugin)
 enablePlugins(ForgeNativeBinaryPlugin)
@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "pprint" % "0.9.6",
   "com.lihaoyi" %% "upickle" % "4.4.3",
   "com.outr" %% "scribe" % "3.19.0",
-  "tech.neander" %% "cue4s" % "0.0.11"
+  "tech.neander" %% "cue4s" % "0.0.12"
 )
 
 buildBinaryConfig ~= { _.withName("sniper") }
